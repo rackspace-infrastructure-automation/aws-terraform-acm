@@ -24,45 +24,41 @@
  * Full working references are available at [examples](examples)
  */
 locals {
+  acm_validation_options = "${aws_acm_certificate.cert.domain_validation_options}"
+  cert_count             = "${local.use_route53_validation ? 1 : 0}"
+  route_53_record_count  = "${local.use_route53_validation ? length(var.subject_alternative_names) + 1 : 0}"
+  use_route53_validation = "${var.validation_method == "DNS" && var.route53_zone_id != ""}"
+
   base_tags = {
-    ServiceProvider = "Rackspace"
     Environment     = "${var.environment}"
+    ServiceProvider = "Rackspace"
   }
 }
 
 resource "aws_acm_certificate" "cert" {
   domain_name               = "${var.domain}"
-  validation_method         = "${var.validation_method}"
   subject_alternative_names = "${var.subject_alternative_names}"
   tags                      = "${merge(local.base_tags, map("Name", var.domain), var.custom_tags)}"
+  validation_method         = "${var.validation_method}"
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-locals {
-  acm_validation_options = "${aws_acm_certificate.cert.domain_validation_options}"
-  use_route53_validation = "${var.validation_method == "DNS" && var.route53_zone_id != ""}"
-
-  route_53_record_count = "${local.use_route53_validation ? length(var.subject_alternative_names) + 1 : 0}"
-
-  cert_count = "${local.use_route53_validation ? 1 : 0}"
-}
-
 resource "aws_route53_record" "cert_validation" {
   count = "${local.route_53_record_count}"
 
-  zone_id = "${var.route53_zone_id}"
   name    = "${lookup(local.acm_validation_options[count.index], "resource_record_name")}"
-  type    = "${lookup(local.acm_validation_options[count.index], "resource_record_type")}"
   records = ["${lookup(local.acm_validation_options[count.index], "resource_record_value")}"]
   ttl     = 60
+  type    = "${lookup(local.acm_validation_options[count.index], "resource_record_type")}"
+  zone_id = "${var.route53_zone_id}"
 }
 
 resource "aws_acm_certificate_validation" "cert" {
-  count           = "${local.cert_count}"
-  certificate_arn = "${aws_acm_certificate.cert.arn}"
+  count = "${local.cert_count}"
 
+  certificate_arn         = "${aws_acm_certificate.cert.arn}"
   validation_record_fqdns = ["${aws_route53_record.cert_validation.*.fqdn}"]
 }

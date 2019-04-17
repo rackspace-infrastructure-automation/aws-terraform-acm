@@ -1,8 +1,3 @@
-output "id" {
-  description = "The ARN of the certificate"
-  value       = "${aws_acm_certificate.cert.id}"
-}
-
 output "arn" {
   description = "The ARN of the certificate"
   value       = "${aws_acm_certificate.cert.arn}"
@@ -20,6 +15,11 @@ e.g. if SANs are defined. Only set if `DNS`-validation was used.
 HEREDOC
 
   value = "${aws_acm_certificate.cert.domain_validation_options}"
+}
+
+output "id" {
+  description = "The ARN of the certificate"
+  value       = "${aws_acm_certificate.cert.id}"
 }
 
 output "validation_emails" {
