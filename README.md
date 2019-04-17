@@ -10,7 +10,7 @@ either use case in order to facilitate a future migration to Route 53 if desired
 
 ## Basic Usage
 
-```
+```hcl
 module "acm" {
     source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.0.1"
 
