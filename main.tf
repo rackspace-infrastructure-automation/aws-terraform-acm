@@ -46,7 +46,7 @@ locals {
   acm_validation_options = "${aws_acm_certificate.cert.domain_validation_options}"
   use_route53_validation = "${var.validation_method == "DNS" && var.route53_zone_id != ""}"
 
-  route_53_record_count = "${local.use_route53_validation ? (length(var.subject_alternative_names)+ 1) : 0}"
+  route_53_record_count = "${local.use_route53_validation ? length(var.subject_alternative_names) + 1 : 0}"
 
   cert_count = "${local.use_route53_validation ? 1 : 0}"
 }
