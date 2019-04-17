@@ -45,10 +45,14 @@ resource "aws_acm_certificate" "cert" {
 locals {
   acm_validation_options = "${aws_acm_certificate.cert.domain_validation_options}"
   use_route53_validation = "${var.validation_method == "DNS" && var.route53_zone_id != ""}"
+
+  route_53_record_count = "${local.use_route53_validation ? (length(var.subject_alternative_names)+ 1) : 0}"
+
+  cert_count = "${local.use_route53_validation ? 1 : 0}"
 }
 
 resource "aws_route53_record" "cert_validation" {
-  count = "${local.use_route53_validation ? (length(var.subject_alternative_names)+ 1) : 0}"
+  count = "${local.route_53_record_count}"
 
   zone_id = "${var.route53_zone_id}"
   name    = "${lookup(local.acm_validation_options[count.index], "resource_record_name")}"
@@ -58,7 +62,7 @@ resource "aws_route53_record" "cert_validation" {
 }
 
 resource "aws_acm_certificate_validation" "cert" {
-  count           = "${local.use_route53_validation ? 1 : 0}"
+  count           = "${local.cert_count}"
   certificate_arn = "${aws_acm_certificate.cert.arn}"
 
   validation_record_fqdns = ["${aws_route53_record.cert_validation.*.fqdn}"]
