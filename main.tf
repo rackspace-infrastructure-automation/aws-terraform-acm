@@ -34,12 +34,11 @@ resource "aws_acm_certificate" "cert" {
   domain_name               = "${var.domain}"
   validation_method         = "${var.validation_method}"
   subject_alternative_names = "${var.subject_alternative_names}"
+  tags                      = "${merge(local.base_tags, map("Name", var.domain), var.custom_tags)}"
 
   lifecycle {
     create_before_destroy = true
   }
-
-  tags = "${merge(local.base_tags, map("Name", var.domain), var.custom_tags)}"
 }
 
 locals {
