@@ -9,27 +9,45 @@ variable "domain" {
   type        = "string"
 }
 
+variable "domain_r53_zone_id" {
+  description = "A domain name for which the certificate should be issued"
+  type        = "string"
+  default     = ""
+}
+
 variable "environment" {
   description = "Application environment for which this network is being created. e.g. Development/Production"
   type        = "string"
   default     = "Development"
 }
 
-variable "route53_zone_id" {
+variable "alt_names_zones" {
   description = <<HEREDOC
-Zone ID of the Route 53 Hosted Zone that will be used to create records for DNS-based validation when the
-`validation_method` is set to `DNS`. If `validation_method` is not set to `DNS`, or if a `route53_zone_id` is not
-provided, then no automated validation will be attempted.
+A map of alternate names and route53 zone ids. The key for each pair is the alternate name in which a certficate must be generated.
+The value in the pair must be the Route53 zone id in which DNS verification will executed for the given alternate name.
+IF DNS/R53 validation will not be executed, the value can be left as empty quotes.
 HEREDOC
 
-  type    = "string"
-  default = ""
+  type    = "map"
+  default = {}
 }
 
-variable "subject_alternative_names" {
-  description = "A list of domains that should be SANs in the issued certificate"
-  type        = "list"
-  default     = []
+variable "alt_names_zones_count" {
+  description = "Provide the count of key/value pairs provided in variable alt_names_zones"
+  type        = "string"
+  default     = 0
+}
+
+variable "zone_ids_provided" {
+  description = "Route53 Zone IDs were provided. A R53 Zone ID must be specified for each domain/alternate name if route53 validation is desired."
+  type        = "string"
+  default     = false
+}
+
+variable "validation_creation_timeout" {
+  description = "aws_acm_certificate_validation resource creation timeout."
+  type        = "string"
+  default     = "30m"
 }
 
 variable "validation_method" {

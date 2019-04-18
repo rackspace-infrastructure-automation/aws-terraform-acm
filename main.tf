@@ -12,22 +12,45 @@
  * ## Basic Usage
  *
  * ```hcl
- * module "acm" {
- *     source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.0.1"
+ *locals {
+ *    alt_names_zones = "${map(
+ *      "foo.example.com", "XXXXXXXXXXXXXX",
+ *      "moo.example.com", "XXXXXXXXXXXXXX",
+ *      "www.example.net", "YYYYYYYYYYYYYY",
+ *      )}"
+ *}
  *
- *     domain = "example.com"
- *     subject_alternative_names = ["foo.example.com", "bar.example.com"]
- *     route53_zone_id = "XXXXXXXXXXXXXX"
- * }
+ *
+ *module "acm" {
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.0.2"
+ *
+ *    domain                = "example.com"
+ *    environment           = "Production"
+ *    domain_r53_zone_id    = "XXXXXXXXXXXXXX"
+ *    alt_names_zones       = "${local.alt_names_zones}"
+ *    alt_names_zones_count = 3
+ *    zone_ids_provided     = true
+ *
+ *    custom_tags = {
+ *      hello = "world"
+ *    }
+ *}
  * ```
  *
  * Full working references are available at [examples](examples)
  */
 locals {
   acm_validation_options = "${aws_acm_certificate.cert.domain_validation_options}"
-  cert_count             = "${local.use_route53_validation ? 1 : 0}"
-  route_53_record_count  = "${local.use_route53_validation ? length(var.subject_alternative_names) + 1 : 0}"
-  use_route53_validation = "${var.validation_method == "DNS" && var.route53_zone_id != ""}"
+
+  use_route53_validation = "${var.validation_method == "DNS" && var.zone_ids_provided}"
+
+  cert_count = "${local.use_route53_validation ? 1 : 0}"
+
+  route_53_record_count = "${local.use_route53_validation ? var.alt_names_zones_count + 1 : 0}"
+
+  subject_alternative_names = "${keys(var.alt_names_zones)}"
+
+  r53_zone_ids = "${flatten(list(list(var.domain_r53_zone_id), values(var.alt_names_zones)))}"
 
   base_tags = {
     Environment     = "${var.environment}"
@@ -37,9 +60,11 @@ locals {
 
 resource "aws_acm_certificate" "cert" {
   domain_name               = "${var.domain}"
-  subject_alternative_names = "${var.subject_alternative_names}"
+  subject_alternative_names = ["${local.subject_alternative_names}"]
   tags                      = "${merge(local.base_tags, map("Name", var.domain), var.custom_tags)}"
   validation_method         = "${var.validation_method}"
+
+  tags = "${merge(local.base_tags, map("Name", var.domain), var.custom_tags)}"
 
   lifecycle {
     create_before_destroy = true
@@ -53,7 +78,7 @@ resource "aws_route53_record" "cert_validation" {
   records = ["${lookup(local.acm_validation_options[count.index], "resource_record_value")}"]
   ttl     = 60
   type    = "${lookup(local.acm_validation_options[count.index], "resource_record_type")}"
-  zone_id = "${var.route53_zone_id}"
+  zone_id = "${element(local.r53_zone_ids, count.index)}"
 }
 
 resource "aws_acm_certificate_validation" "cert" {
@@ -61,4 +86,8 @@ resource "aws_acm_certificate_validation" "cert" {
 
   certificate_arn         = "${aws_acm_certificate.cert.arn}"
   validation_record_fqdns = ["${aws_route53_record.cert_validation.*.fqdn}"]
+
+  timeouts {
+    create = "${var.validation_creation_timeout}"
+  }
 }

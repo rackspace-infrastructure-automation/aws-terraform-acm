@@ -11,8 +11,7 @@ resource "random_string" "rstring" {
 }
 
 module "acm" {
-  source = "../../module"
-
+  source      = "../../module"
   domain      = "${random_string.rstring.result}.mupo181ve1jco37.net"
   environment = "Production"
 
