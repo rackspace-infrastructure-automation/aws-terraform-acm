@@ -12,7 +12,7 @@ resource "random_string" "rstring" {
 
 module "acm" {
   source      = "../../module"
-  domain      = "${random_string.rstring.result}.mupo181ve1jco37.net"
+  fqdn_list   = ["${random_string.rstring.result}.mupo181ve1jco37.net"]
   environment = "Production"
 
   custom_tags = {
