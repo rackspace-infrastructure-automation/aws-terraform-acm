@@ -26,7 +26,7 @@ module "acm" {
   fqdn_list                 = ["example.com"]
   environment               = "Production"
   fqdn_to_r53zone_map       = "${local.fqdn_to_r53zone_map}"
-  fqdn_to_r53zone_map_count = 3
+  fqdn_to_r53zone_map_count = 4
 
   custom_tags = {
     hello = "world"
