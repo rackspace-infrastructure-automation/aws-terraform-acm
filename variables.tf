@@ -4,9 +4,10 @@ variable "custom_tags" {
   default     = {}
 }
 
-variable "domain" {
-  description = "A domain name for which the certificate should be issued"
-  type        = "string"
+variable "fqdn_list" {
+  description = "A list FQDNs for which the certificate should be issued."
+  type        = "list"
+  default     = []
 }
 
 variable "environment" {
@@ -15,21 +16,26 @@ variable "environment" {
   default     = "Development"
 }
 
-variable "route53_zone_id" {
+variable "fqdn_to_r53zone_map" {
   description = <<HEREDOC
-Zone ID of the Route 53 Hosted Zone that will be used to create records for DNS-based validation when the
-`validation_method` is set to `DNS`. If `validation_method` is not set to `DNS`, or if a `route53_zone_id` is not
-provided, then no automated validation will be attempted.
+A map of alternate Route 53 zone ids and corresponding FQDNs to validate. The key for each pair is the FQDN in which a certficate must be generated.
+This map will typically contain all of the FQDNS provided in fqdn_list.
 HEREDOC
 
-  type    = "string"
-  default = ""
+  type    = "map"
+  default = {}
 }
 
-variable "subject_alternative_names" {
-  description = "A list of domains that should be SANs in the issued certificate"
-  type        = "list"
-  default     = []
+variable "fqdn_to_r53zone_map_count" {
+  description = "Provide the count of key/value pairs provided in variable fqdn_to_r53zone_map"
+  type        = "string"
+  default     = 0
+}
+
+variable "validation_creation_timeout" {
+  description = "aws_acm_certificate_validation resource creation timeout."
+  type        = "string"
+  default     = "45m"
 }
 
 variable "validation_method" {

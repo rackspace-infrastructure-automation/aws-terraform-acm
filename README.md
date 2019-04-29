@@ -11,13 +11,28 @@ either use case in order to facilitate a future migration to Route 53 if desired
 ## Basic Usage
 
 ```hcl
-module "acm" {
-    source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.0.1"
-
-    domain = "example.com"
-    subject_alternative_names = ["foo.example.com", "bar.example.com"]
-    route53_zone_id = "XXXXXXXXXXXXXX"
+locals {
+  fqdn_to_r53zone_map = "${map(
+    "example.com", "XXXXXXXXXXXXXX",
+    "foo.example.com", "XXXXXXXXXXXXXX",
+    "moo.example.com", "XXXXXXXXXXXXXX",
+    "www.example.net", "YYYYYYYYYYYYYY",
+    )}"
 }
+
+module "acm" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.0.2"
+
+  fqdn_list                 = ["example.com"]
+  environment               = "Production"
+  fqdn_to_r53zone_map       = "${local.fqdn_to_r53zone_map}"
+  fqdn_to_r53zone_map_count = 4
+
+  custom_tags = {
+    hello = "world"
+  }
+}
+
 ```
 
 Full working references are available at [examples](examples)
@@ -27,10 +42,11 @@ Full working references are available at [examples](examples)
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | custom\_tags | Optional tags to be applied on top of the base tags on all resources | map | `<map>` | no |
-| domain | A domain name for which the certificate should be issued | string | n/a | yes |
 | environment | Application environment for which this network is being created. e.g. Development/Production | string | `"Development"` | no |
-| route53\_zone\_id | Zone ID of the Route 53 Hosted Zone that will be used to create records for DNS-based validation when the `validation_method` is set to `DNS`. If `validation_method` is not set to `DNS`, or if a `route53_zone_id` is not provided, then no automated validation will be attempted. | string | `""` | no |
-| subject\_alternative\_names | A list of domains that should be SANs in the issued certificate | list | `<list>` | no |
+| fqdn\_list | A list FQDNs for which the certificate should be issued. | list | `<list>` | no |
+| fqdn\_to\_r53zone\_map | A map of alternate Route 53 zone ids and corresponding FQDNs to validate. The key for each pair is the FQDN in which a certficate must be generated. This map will typically contain all of the FQDNS provided in fqdn_list. | map | `<map>` | no |
+| fqdn\_to\_r53zone\_map\_count | Provide the count of key/value pairs provided in variable fqdn_to_r53zone_map | string | `"0"` | no |
+| validation\_creation\_timeout | aws_acm_certificate_validation resource creation timeout. | string | `"45m"` | no |
 | validation\_method | Which method to use for validation. `DNS` or `EMAIL` are valid, `NONE` can be used for certificates that were imported into ACM and then into Terraform. | string | `"DNS"` | no |
 
 ## Outputs
