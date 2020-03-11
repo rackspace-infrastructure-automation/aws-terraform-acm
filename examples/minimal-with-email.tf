@@ -1,9 +1,9 @@
 module "acm" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.0.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.0.2"
 
-  fqdn_list         = ["example.com"]
   environment       = "Test"
-  validation_method = "Email"
+  fqdn_list         = ["domain1.com"]
+  validation_method = "EMAIL"
 
   custom_tags = {
     hello = "world"
