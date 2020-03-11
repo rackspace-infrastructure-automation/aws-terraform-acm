@@ -9,12 +9,8 @@ output "domain_name" {
 }
 
 output "domain_validation_options" {
-  description = <<HEREDOC
-A list of attributes to feed into other resources to complete certificate validation. Can have more than one element,
-e.g. if SANs are defined. Only set if `DNS`-validation was used.
-HEREDOC
-
-  value = "${aws_acm_certificate.cert.domain_validation_options}"
+  description = "A list of attributes to feed into other resources to complete certificate validation. Can have more than one element, e.g. if SANs are defined. Only set if `DNS`-validation was used."
+  value       = "${aws_acm_certificate.cert.domain_validation_options}"
 }
 
 output "id" {
@@ -23,9 +19,6 @@ output "id" {
 }
 
 output "validation_emails" {
-  description = <<HEREDOC
-A list of addresses that received a validation E-Mail. Only set if `EMAIL`-validation was used.
-HEREDOC
-
-  value = "${aws_acm_certificate.cert.validation_emails}"
+  description = "A list of addresses that received a validation E-Mail. Only set if `EMAIL`-validation was used."
+  value       = "${aws_acm_certificate.cert.validation_emails}"
 }

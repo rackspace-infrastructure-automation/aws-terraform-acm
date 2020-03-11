@@ -61,7 +61,7 @@ Full working references are available at [examples](examples)
 |------|-------------|
 | arn | The ARN of the certificate |
 | domain\_name | The domain name for which the certificate is issued |
-| domain\_validation\_options | A list of attributes to feed into other resources to complete certificate validation. Can have more than one element,<br>e.g. if SANs are defined. Only set if `DNS`-validation was used. |
+| domain\_validation\_options | A list of attributes to feed into other resources to complete certificate validation. Can have more than one element, e.g. if SANs are defined. Only set if `DNS`-validation was used. |
 | id | The ARN of the certificate |
 | validation\_emails | A list of addresses that received a validation E-Mail. Only set if `EMAIL`-validation was used. |
 
