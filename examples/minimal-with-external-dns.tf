@@ -4,7 +4,7 @@ module "acm" {
   environment = "Production"
   fqdn_list   = ["domain1.com"]
 
-  custom_tags = {
+  tags = {
     hello = "world"
   }
 }

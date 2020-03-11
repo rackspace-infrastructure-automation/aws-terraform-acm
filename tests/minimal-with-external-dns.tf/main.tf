@@ -16,7 +16,7 @@ module "acm" {
   environment = "Production"
   fqdn_list   = ["${random_string.rstring.result}.mupo181ve1jco37.net"]
 
-  custom_tags = {
+  tags = {
     hello = "world"
   }
 }

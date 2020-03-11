@@ -37,6 +37,16 @@
  * ```
  *
  * Full working references are available at [examples](examples)
+ *
+ * ## Module variables
+ *
+ * The following module variables changes have occurred:
+ *
+ * #### Deprecations
+ * - `custom_tags` - marked for deprecation as it no longer meets our standards.
+ *
+ * #### Additions
+ * - `tags` - introduced as a replacement for `custom_tags` to better align with our standards.
  */
 locals {
   acm_validation_options = "${aws_acm_certificate.cert.domain_validation_options}"
@@ -62,7 +72,7 @@ locals {
 resource "aws_acm_certificate" "cert" {
   domain_name               = "${local.certificate_domain}"
   subject_alternative_names = ["${local.subject_alternative_names}"]
-  tags                      = "${merge(local.base_tags, map("Name", local.certificate_domain), var.custom_tags)}"
+  tags                      = "${merge(var.custom_tags, var.tags, local.base_tags, map("Name", local.certificate_domain))}"
   validation_method         = "${var.validation_method}"
 
   lifecycle {

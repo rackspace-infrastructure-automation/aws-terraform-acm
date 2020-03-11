@@ -23,7 +23,7 @@ module "acm" {
   fqdn_to_r53zone_map       = "${local.fqdn_to_r53zone_map}"
   fqdn_to_r53zone_map_count = 4
 
-  custom_tags = {
+  tags = {
     hello = "world"
   }
 }

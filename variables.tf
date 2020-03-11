@@ -1,5 +1,5 @@
 variable "custom_tags" {
-  description = "Optional tags to be applied on top of the base tags on all resources"
+  description = "Optional tags to be applied on top of the base tags on all resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases."
   type        = "map"
   default     = {}
 }
@@ -30,6 +30,12 @@ variable "fqdn_to_r53zone_map_count" {
   description = "Provide the count of key/value pairs provided in variable fqdn_to_r53zone_map"
   type        = "string"
   default     = 0
+}
+
+variable "tags" {
+  description = "Optional tags to be applied on top of the base tags on all resources"
+  type        = "map"
+  default     = {}
 }
 
 variable "validation_creation_timeout" {

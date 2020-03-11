@@ -5,7 +5,7 @@ module "acm" {
   fqdn_list         = ["domain1.com"]
   validation_method = "EMAIL"
 
-  custom_tags = {
+  tags = {
     hello = "world"
   }
 }
