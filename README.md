@@ -60,11 +60,11 @@ The following module variables changes have occurred:
 | custom\_tags | Optional tags to be applied on top of the base tags on all resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. | `map` | `{}` | no |
 | environment | Application environment for which this network is being created. e.g. Development/Production | `string` | `"Development"` | no |
 | fqdn\_list | A list FQDNs for which the certificate should be issued. | `list` | `[]` | no |
-| fqdn\_to\_r53zone\_map | A map of alternate Route 53 zone ids and corresponding FQDNs to validate. The key for each pair is the FQDN in which a certficate must be generated.<br>This map will typically contain all of the FQDNS provided in fqdn\_list. | `map` | `{}` | no |
+| fqdn\_to\_r53zone\_map | A map of alternate Route 53 zone ids and corresponding FQDNs to validate. The key for each pair is the FQDN in which a certficate must be generated. This map will typically contain all of the FQDNS provided in fqdn\_list. | `map` | `{}` | no |
 | fqdn\_to\_r53zone\_map\_count | Provide the count of key/value pairs provided in variable fqdn\_to\_r53zone\_map | `string` | `0` | no |
 | tags | Optional tags to be applied on top of the base tags on all resources | `map` | `{}` | no |
 | validation\_creation\_timeout | aws\_acm\_certificate\_validation resource creation timeout. | `string` | `"45m"` | no |
-| validation\_method | Which method to use for validation. `DNS` or `EMAIL` are valid, `NONE` can be used for certificates that were imported<br>into ACM and then into Terraform. | `string` | `"DNS"` | no |
+| validation\_method | Which method to use for validation. `DNS` or `EMAIL` are valid, `NONE` can be used for certificates that were imported into ACM and then into Terraform. | `string` | `"DNS"` | no |
 
 ## Outputs
 
