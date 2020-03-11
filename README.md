@@ -12,23 +12,23 @@ either use case in order to facilitate a future migration to Route 53 if desired
 
 ```hcl
 locals {
-  fqdn_to_r53zone_map = "${map(
-    "example.com", "XXXXXXXXXXXXXX",
-    "foo.example.com", "XXXXXXXXXXXXXX",
-    "moo.example.com", "XXXXXXXXXXXXXX",
-    "www.example.net", "YYYYYYYYYYYYYY",
-    )}"
+  fqdn_to_r53zone_map = {
+    "example.com"     = "XXXXXXXXXXXXXX",
+    "foo.example.com" = "XXXXXXXXXXXXXX",
+    "moo.example.com" = "XXXXXXXXXXXXXX",
+    "www.example.net" = "YYYYYYYYYYYYYY",
+  }
 }
 
 module "acm" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.0.2"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.12.0"
 
-  fqdn_list                 = ["example.com"]
   environment               = "Production"
-  fqdn_to_r53zone_map       = "${local.fqdn_to_r53zone_map}"
+  fqdn_list                 = ["example.com"]
+  fqdn_to_r53zone_map       = local.fqdn_to_r53zone_map
   fqdn_to_r53zone_map_count = 4
 
-  custom_tags = {
+  tags = {
     hello = "world"
   }
 }
@@ -51,18 +51,18 @@ The following module variables changes have occurred:
 
 | Name | Version |
 |------|---------|
-| aws | n/a |
+| aws | >= 2.7.0 |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:-----:|
-| custom\_tags | Optional tags to be applied on top of the base tags on all resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. | `map` | `{}` | no |
+| custom\_tags | Optional tags to be applied on top of the base tags on all resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. | `map(string)` | `{}` | no |
 | environment | Application environment for which this network is being created. e.g. Development/Production | `string` | `"Development"` | no |
-| fqdn\_list | A list FQDNs for which the certificate should be issued. | `list` | `[]` | no |
-| fqdn\_to\_r53zone\_map | A map of alternate Route 53 zone ids and corresponding FQDNs to validate. The key for each pair is the FQDN in which a certficate must be generated. This map will typically contain all of the FQDNS provided in fqdn\_list. | `map` | `{}` | no |
+| fqdn\_list | A list FQDNs for which the certificate should be issued. | `list(string)` | `[]` | no |
+| fqdn\_to\_r53zone\_map | A map of alternate Route 53 zone ids and corresponding FQDNs to validate. The key for each pair is the FQDN in which a certficate must be generated. This map will typically contain all of the FQDNS provided in fqdn\_list. | `map(string)` | `{}` | no |
 | fqdn\_to\_r53zone\_map\_count | Provide the count of key/value pairs provided in variable fqdn\_to\_r53zone\_map | `string` | `0` | no |
-| tags | Optional tags to be applied on top of the base tags on all resources | `map` | `{}` | no |
+| tags | Optional tags to be applied on top of the base tags on all resources | `map(string)` | `{}` | no |
 | validation\_creation\_timeout | aws\_acm\_certificate\_validation resource creation timeout. | `string` | `"45m"` | no |
 | validation\_method | Which method to use for validation. `DNS` or `EMAIL` are valid, `NONE` can be used for certificates that were imported into ACM and then into Terraform. | `string` | `"DNS"` | no |
 

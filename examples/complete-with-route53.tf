@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 resource "aws_route53_zone" "primary" {
   name = "domain1.com"
 }
@@ -7,20 +11,20 @@ resource "aws_route53_zone" "secondary" {
 }
 
 locals {
-  fqdn_to_r53zone_map = "${map(
-    "domain1.com", aws_route53_zone.primary.zone_id,
-    "foo.domain1.com", aws_route53_zone.primary.zone_id,
-    "moo.domain1.com", aws_route53_zone.primary.zone_id,
-    "www.domain1.net", aws_route53_zone.secondary.zone_id,
-    )}"
+  fqdn_to_r53zone_map = {
+    "domain1.com"     = aws_route53_zone.primary.zone_id
+    "foo.domain1.com" = aws_route53_zone.primary.zone_id
+    "moo.domain1.com" = aws_route53_zone.primary.zone_id
+    "www.domain1.net" = aws_route53_zone.secondary.zone_id
+  }
 }
 
 module "acm" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.0.2"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.12.0"
 
   environment               = "Production"
-  fqdn_list                 = "${keys(local.fqdn_to_r53zone_map)}"
-  fqdn_to_r53zone_map       = "${local.fqdn_to_r53zone_map}"
+  fqdn_list                 = keys(local.fqdn_to_r53zone_map)
+  fqdn_to_r53zone_map       = local.fqdn_to_r53zone_map
   fqdn_to_r53zone_map_count = 4
 
   tags = {
