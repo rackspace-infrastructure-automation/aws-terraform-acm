@@ -4,16 +4,16 @@ variable "custom_tags" {
   default     = {}
 }
 
-variable "fqdn_list" {
-  description = "A list FQDNs for which the certificate should be issued."
-  type        = "list"
-  default     = []
-}
-
 variable "environment" {
   description = "Application environment for which this network is being created. e.g. Development/Production"
   type        = "string"
   default     = "Development"
+}
+
+variable "fqdn_list" {
+  description = "A list FQDNs for which the certificate should be issued."
+  type        = "list"
+  default     = []
 }
 
 variable "fqdn_to_r53zone_map" {
