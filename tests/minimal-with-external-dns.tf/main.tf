@@ -5,17 +5,18 @@ provider "aws" {
 resource "random_string" "rstring" {
   length  = 6
   lower   = true
-  upper   = false
   number  = false
   special = false
+  upper   = false
 }
 
 module "acm" {
-  source      = "../../module"
-  fqdn_list   = ["${random_string.rstring.result}.mupo181ve1jco37.net"]
-  environment = "Production"
+  source = "../../module"
 
-  custom_tags = {
+  environment = "Production"
+  fqdn_list   = ["${random_string.rstring.result}.mupo181ve1jco37.net"]
+
+  tags = {
     hello = "world"
   }
 }

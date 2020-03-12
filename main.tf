@@ -20,23 +20,33 @@
  *     "www.example.net", "YYYYYYYYYYYYYY",
  *     )}"
  * }
- * 
+ *
  * module "acm" {
  *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.0.2"
- * 
+ *
  *   fqdn_list                 = ["example.com"]
  *   environment               = "Production"
  *   fqdn_to_r53zone_map       = "${local.fqdn_to_r53zone_map}"
  *   fqdn_to_r53zone_map_count = 4
- * 
+ *
  *   custom_tags = {
  *     hello = "world"
  *   }
  * }
- * 
+ *
  * ```
  *
  * Full working references are available at [examples](examples)
+ *
+ * ## Module variables
+ *
+ * The following module variables changes have occurred:
+ *
+ * #### Deprecations
+ * - `custom_tags` - marked for deprecation as it no longer meets our standards.
+ *
+ * #### Additions
+ * - `tags` - introduced as a replacement for `custom_tags` to better align with our standards.
  */
 locals {
   acm_validation_options = "${aws_acm_certificate.cert.domain_validation_options}"
@@ -62,7 +72,7 @@ locals {
 resource "aws_acm_certificate" "cert" {
   domain_name               = "${local.certificate_domain}"
   subject_alternative_names = ["${local.subject_alternative_names}"]
-  tags                      = "${merge(local.base_tags, map("Name", local.certificate_domain), var.custom_tags)}"
+  tags                      = "${merge(var.custom_tags, var.tags, local.base_tags, map("Name", local.certificate_domain))}"
   validation_method         = "${var.validation_method}"
 
   lifecycle {
@@ -83,8 +93,7 @@ resource "aws_route53_record" "cert_validation" {
 resource "aws_acm_certificate_validation" "cert" {
   count = "${local.cert_count}"
 
-  certificate_arn = "${aws_acm_certificate.cert.arn}"
-
+  certificate_arn         = "${aws_acm_certificate.cert.arn}"
   validation_record_fqdns = ["${aws_route53_record.cert_validation.*.fqdn}"]
 
   timeouts {
