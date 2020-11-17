@@ -28,6 +28,12 @@ variable "fqdn_to_r53zone_map_count" {
   default     = 0
 }
 
+variable "self_signed" {
+  description = "Boolean value indicating if a certificate should be self-signed."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Optional tags to be applied on top of the base tags on all resources"
   type        = map(string)

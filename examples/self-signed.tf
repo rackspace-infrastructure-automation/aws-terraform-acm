@@ -5,8 +5,9 @@ terraform {
 module "acm" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.12.3"
 
-  environment = "Production"
+  environment = "Test"
   fqdn_list   = ["domain1.com"]
+  self_signed = true
 
   tags = {
     hello = "world"

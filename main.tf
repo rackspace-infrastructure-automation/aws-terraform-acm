@@ -12,22 +12,11 @@
  * ## Basic Usage
  *
  * ```hcl
- * locals {
- *   fqdn_to_r53zone_map = {
- *     "example.com"     = "XXXXXXXXXXXXXX",
- *     "foo.example.com" = "XXXXXXXXXXXXXX",
- *     "moo.example.com" = "XXXXXXXXXXXXXX",
- *     "www.example.net" = "YYYYYYYYYYYYYY",
- *   }
- * }
- *
  * module "acm" {
- *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.12.0"
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.12.3"
  *
  *   environment               = "Production"
  *   fqdn_list                 = ["example.com"]
- *   fqdn_to_r53zone_map       = local.fqdn_to_r53zone_map
- *   fqdn_to_r53zone_map_count = 4
  *
  *   tags = {
  *     hello = "world"
@@ -54,13 +43,14 @@ terraform {
 
   required_providers {
     aws = ">= 2.7.0"
+    tls = ">= 2.0"
   }
 }
 
 locals {
   acm_validation_options = aws_acm_certificate.cert.domain_validation_options
 
-  use_route53_validation = var.validation_method == "DNS" && var.fqdn_to_r53zone_map_count > 0
+  use_route53_validation = var.validation_method == "DNS" && var.fqdn_to_r53zone_map_count > 0 && ! var.self_signed
 
   cert_count = local.use_route53_validation ? 1 : 0
 
@@ -79,11 +69,38 @@ locals {
   }
 }
 
+resource "tls_private_key" "self" {
+  count = var.self_signed ? 1 : 0
+
+  algorithm = "RSA"
+  rsa_bits  = "2048"
+}
+
+resource "tls_self_signed_cert" "self" {
+  count = var.self_signed ? 1 : 0
+
+  key_algorithm         = "RSA"
+  private_key_pem       = tls_private_key.self[0].private_key_pem
+  validity_period_hours = 2160
+
+  subject {
+    common_name = local.certificate_domain
+  }
+
+  allowed_uses = [
+    "digital_signature",
+    "key_encipherment",
+    "server_auth",
+  ]
+}
+
 resource "aws_acm_certificate" "cert" {
-  domain_name               = local.certificate_domain
-  subject_alternative_names = local.subject_alternative_names
+  certificate_body          = var.self_signed ? tls_self_signed_cert.self[0].cert_pem : null
+  domain_name               = var.self_signed ? null : local.certificate_domain
+  private_key               = var.self_signed ? tls_private_key.self[0].private_key_pem : null
+  subject_alternative_names = var.self_signed ? null : local.subject_alternative_names
   tags                      = merge(var.custom_tags, var.tags, local.base_tags)
-  validation_method         = var.validation_method
+  validation_method         = var.self_signed ? null : var.validation_method
 
   lifecycle {
     create_before_destroy = true
