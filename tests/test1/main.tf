@@ -25,3 +25,15 @@ module "acm" {
     hello = "world"
   }
 }
+
+module "self_signed" {
+   source = "../../module"
+
+  environment = "Production"
+  self_signed = true
+  fqdn_list   = ["self-signed-${random_string.rstring.result}.mupo181ve1jco37.net"]
+
+  tags = {
+    hello = "world"
+  }
+}

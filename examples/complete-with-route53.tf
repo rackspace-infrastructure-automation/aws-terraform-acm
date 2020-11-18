@@ -20,7 +20,7 @@ locals {
 }
 
 module "acm" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.12.0"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.12.3"
 
   environment               = "Production"
   fqdn_list                 = keys(local.fqdn_to_r53zone_map)
