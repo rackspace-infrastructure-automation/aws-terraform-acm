@@ -47,16 +47,32 @@ The following module variables changes have occurred:
 #### Additions
 - `tags` - introduced as a replacement for `custom_tags` to better align with our standards.
 
+## Requirements
+
+No requirements.
+
 ## Providers
 
 | Name | Version |
 |------|---------|
 | aws | n/a |
 
+## Modules
+
+No Modules.
+
+## Resources
+
+| Name |
+|------|
+| [aws_acm_certificate](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) |
+| [aws_acm_certificate_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) |
+| [aws_route53_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:-----:|
+|------|-------------|------|---------|:--------:|
 | custom\_tags | Optional tags to be applied on top of the base tags on all resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. | `map` | `{}` | no |
 | environment | Application environment for which this network is being created. e.g. Development/Production | `string` | `"Development"` | no |
 | fqdn\_list | A list FQDNs for which the certificate should be issued. | `list` | `[]` | no |
@@ -75,4 +91,3 @@ The following module variables changes have occurred:
 | domain\_validation\_options | A list of attributes to feed into other resources to complete certificate validation. Can have more than one element, e.g. if SANs are defined. Only set if `DNS`-validation was used. |
 | id | The ARN of the certificate |
 | validation\_emails | A list of addresses that received a validation E-Mail. Only set if `EMAIL`-validation was used. |
-
