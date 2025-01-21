@@ -1,3 +1,6 @@
+> [!CAUTION]
+> This project is end of life. This repo will be deleted on June 2nd 2025.
+
 # aws-terraform-acm
 
 This module creates an ACM certificate and automatically validates it via DNS validation if a Route 53 zone id for a  
